@@ -5,7 +5,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace yuanzhihai\response\think\support\Facades;
+namespace yuanzhihai\response\think\support\facades;
 
 use think\Facade as ThinkFacade;
 
