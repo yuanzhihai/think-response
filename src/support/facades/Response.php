@@ -16,11 +16,11 @@ use think\Facade as ThinkFacade;
  * @method static \think\Response localize(int $code = 200, array $headers = [], array $options = [])
  * @method static \think\Response ok(string $message = '', int $code = 200, array $headers = [], array $options = [])
  * @method static \think\Response success($data = null, string $message = '', int $code = 200, array $headers = [], array $options = [])
- * @method static void errorBadRequest(?string $message = '')
- * @method static void errorForbidden(string $message = '')
- * @method static void errorNotFound(string $message = '')
- * @method static void errorMethodNotAllowed(string $message = '')
- * @method static void errorInternal(string $message = '')
+ * @method static \think\Response errorBadRequest(?string $message = '')
+ * @method static \think\Response errorForbidden(string $message = '')
+ * @method static \think\Response errorNotFound(string $message = '')
+ * @method static \think\Response errorMethodNotAllowed(string $message = '')
+ * @method static \think\Response errorInternal(string $message = '')
  * @method static \think\Response fail(string $message = '', int $code = 500, $errors = null, array $headers = [], array $options = [])
  *
  * @see \yuanzhihai\response\think\Response
