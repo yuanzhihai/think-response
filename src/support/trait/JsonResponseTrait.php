@@ -128,7 +128,7 @@ trait JsonResponseTrait
      */
     public function errorMethodNotAllowed(string $message = '')
     {
-        $this->fail($message, 405);
+        return $this->fail($message, 405);
     }
 
     /**

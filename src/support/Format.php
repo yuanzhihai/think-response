@@ -8,7 +8,7 @@ use think\helper\Arr;
 use think\Paginator;
 use think\Response;
 
-class Format
+class Format implements \yuanzhihai\response\think\contracts\Format
 {
     use Macroable;
 
