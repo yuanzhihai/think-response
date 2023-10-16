@@ -3,7 +3,9 @@
 namespace yuanzhihai\response\think\support;
 
 use Spatie\Macroable\Macroable;
+use think\contract\Arrayable;
 use think\facade\Config;
+use think\facade\Lang;
 use think\helper\Arr;
 use think\Paginator;
 use think\Response;
@@ -47,17 +49,12 @@ class Format implements \yuanzhihai\response\think\contracts\Format
      */
     public function data($data, ?string $message, int $code, $errors = null): array
     {
-        $data = match (true) {
-            $data instanceof Paginator => $this->paginator($data),
-            (is_object($data) && method_exists($data, 'toArray')) => $data->toArray(),
-            default => Arr::wrap($data)
-        };
         return $this->formatDataFields([
-            'status'  => $this->formatStatus($code),
+            'status'  => $this->formatStatus($this->formatStatusCode($code, $data)),
             'code'    => $code,
             'message' => $this->formatMessage($code, $message),
-            'data'    => $data ?: (object)$data,
-            'error'   => $errors ?: (object)[],
+            'data'    => $this->formatData($data),
+            'error'   => $this->formatError($errors),
         ], $this->config);
     }
 
@@ -85,43 +82,50 @@ class Format implements \yuanzhihai\response\think\contracts\Format
      */
     protected function formatMessage(int $code, ?string $message): ?string
     {
-        if (!$message && class_exists($enumClass = Config::get('response.enum'))) {
-            $message = $enumClass::fromValue($code)->description;
-        }
+        $localizationKey = implode('.', [Config::get('response.locale', 'enums'), $code]);
+        return match (true) {
+            !$message && Lang::has($localizationKey) => Lang::get($localizationKey),
+            default => $message
+        };
 
-        return $message;
     }
 
     /**
      * Format http status description.
      *
-     * @param int $code
+     * @param int $statusCode
      * @return string
      */
-    protected function formatStatus(int $code): string
+    protected function formatStatus(int $statusCode): string
     {
-        $statusCode = $this->formatStatusCode($code);
-        if ($statusCode >= 400 && $statusCode <= 499) {// client error
-            $status = 'error';
-        } elseif ($statusCode >= 500 && $statusCode <= 599) {// service error
-            $status = 'fail';
-        } else {
-            $status = 'success';
-        }
+        return match (true) {
+            ($statusCode >= 400 && $statusCode <= 499) => 'error',// client error
+            ($statusCode >= 500 && $statusCode <= 599) => 'fail',// service error
+            default => 'success'
+        };
 
-        return $status;
     }
 
     /**
      * Http status code.
-     *
-     * @param $code
-     * @param string $from
      * @return int
      */
-    protected function formatStatusCode($code, string $from = 'success'): int
+    protected function formatStatusCode($code, $oriData): int
     {
-        return (int)substr($from === 'fail' ? (Config::get('response.error_code') ?: $code) : $code, 0, 3);
+        return (int)substr(is_null($oriData) ? (Config::get('response.error_code') ?: $code) : $code, 0, 3);
+    }
+
+    /**
+     * Format data.
+     */
+    protected function formatData($data): array|object
+    {
+        return match (true) {
+            $data instanceof Paginator => $this->paginator($data),
+            $data instanceof Arrayable || (is_object($data) && method_exists($data, 'toArray')) => $data->toArray(),
+            empty($data) => (object)$data,
+            default => Arr::wrap($data)
+        };
     }
 
     /**
@@ -146,6 +150,14 @@ class Format implements \yuanzhihai\response\think\contracts\Format
     }
 
     /**
+     * Format error.
+     */
+    protected function formatError(?array $error): object|array
+    {
+        return $error ?: (object)[];
+    }
+
+    /**
      * Format response data fields.
      *
      * @param array $responseData
@@ -164,7 +176,7 @@ class Format implements \yuanzhihai\response\think\contracts\Format
                 continue;
             }
 
-            if ($value && is_array($value) && in_array($field, ['data', 'meta', 'pagination', 'links'])) {
+            if ($value && is_array($value) && in_array($field, ['data', 'meta', 'pagination'])) {
                 $value = $this->formatDataFields($value, Arr::get($dataFieldsConfig, "{$field}.fields", []));
             }
 

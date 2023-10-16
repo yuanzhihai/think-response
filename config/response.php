@@ -14,7 +14,8 @@ return [
     */
     'error_code' => false,
 
-    'enum'      => '',//\yuanzhihai\enum\think\Enums\HttpStatusCodeEnum::class
+    // lang/zh-cn/enums.php
+    'locale' => 'enums',
 
     //  You can set some attributes (eg:code/message/header/options) for the exception, and it will override the default attributes of the exception
     'exception' => [
