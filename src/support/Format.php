@@ -94,6 +94,14 @@ class Format implements \yuanzhihai\response\think\contracts\Format
     }
 
     /**
+     * Format business code.
+     */
+    protected function formatBusinessCode(int $code): int
+    {
+        return $code;
+    }
+
+    /**
      * Format http status description.
      *
      * @param int $statusCode
