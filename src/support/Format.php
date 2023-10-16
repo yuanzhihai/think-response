@@ -35,9 +35,9 @@ class Format implements \yuanzhihai\response\think\contracts\Format
      * @param string $from
      * @return Response
      */
-    public function response($data = [], string $message = '', int $code = 200, $errors = null, array $headers = [], array $options = [], string $from = 'success'): Response
+    public function response($data = [], string $message = '', int $code = 200, $errors = null, array $headers = [], array $options = []): Response
     {
-        return Response::create($this->data($data, $message, $code, $errors), 'json', $this->formatStatusCode($code, $from))->header($headers)->options($options);
+        return Response::create($this->data($data, $message, $code, $errors), 'json', $this->formatStatusCode($code, $data))->header($headers)->options($options);
     }
 
     /**

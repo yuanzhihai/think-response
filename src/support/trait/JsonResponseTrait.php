@@ -14,7 +14,7 @@ trait JsonResponseTrait
      * @param string $location
      * @return Response
      */
-    public function accepted($data = [], string $message = '', string $location = '')
+    public function accepted($data = [], string $message = '', string $location = ''): Response
     {
         $response = $this->success($data, $message, 202);
         if ($location) {
@@ -32,7 +32,7 @@ trait JsonResponseTrait
      * @param string $location
      * @return Response
      */
-    public function created($data = [], string $message = '', string $location = '')
+    public function created($data = [], string $message = '', string $location = ''): Response
     {
         $response = $this->success($data, $message, 201);
         if ($location) {
@@ -48,7 +48,7 @@ trait JsonResponseTrait
      * @param string $message
      * @return Response
      */
-    public function noContent(string $message = '')
+    public function noContent(string $message = ''): Response
     {
         return $this->success([], $message, 204);
     }
@@ -76,7 +76,7 @@ trait JsonResponseTrait
      * @param array $options
      * @return Response
      */
-    public function localize(int $code = 200, array $headers = [], array $options = [])
+    public function localize(int $code = 200, array $headers = [], array $options = []): Response
     {
         return $this->ok('', $code, $headers, $options);
     }
@@ -86,7 +86,7 @@ trait JsonResponseTrait
      *
      * @param string|null $message
      */
-    public function errorBadRequest(string $message = '')
+    public function errorBadRequest(string $message = ''): Response
     {
         return $this->fail($message, 400);
     }
@@ -96,7 +96,7 @@ trait JsonResponseTrait
      *
      * @param string $message
      */
-    public function errorUnauthorized(string $message = '')
+    public function errorUnauthorized(string $message = ''): Response
     {
         return $this->fail($message, 401);
     }
@@ -106,7 +106,7 @@ trait JsonResponseTrait
      *
      * @param string $message
      */
-    public function errorForbidden(string $message = '')
+    public function errorForbidden(string $message = ''): Response
     {
         return $this->fail($message, 403);
     }
@@ -126,7 +126,7 @@ trait JsonResponseTrait
      *
      * @param string $message
      */
-    public function errorMethodNotAllowed(string $message = '')
+    public function errorMethodNotAllowed(string $message = ''): Response
     {
         return $this->fail($message, 405);
     }
@@ -136,7 +136,7 @@ trait JsonResponseTrait
      *
      * @param string $message
      */
-    public function errorInternal(string $message = '')
+    public function errorInternal(string $message = ''): Response
     {
         return $this->fail($message);
     }
@@ -154,7 +154,7 @@ trait JsonResponseTrait
      */
     public function fail(string $message = '', int $code = 500, $errors = null, array $headers = [], array $options = [])
     {
-        return $this->formatter->response(null, $message, $code, $errors, $headers, $options, 'fail');
+        return $this->formatter->response(null, $message, $code, $errors, $headers, $options);
     }
 
     /**
