@@ -16,6 +16,8 @@ class Format implements \yuanzhihai\response\think\contracts\Format
 
     protected $config;
 
+    protected int $statusCode = 200;
+
     public function __construct($config = [])
     {
         $this->config = $config;
@@ -49,13 +51,14 @@ class Format implements \yuanzhihai\response\think\contracts\Format
      */
     public function data($data, ?string $message, int $code, $errors = null): array
     {
+        $this->statusCode = $this->formatStatusCode($this->formatBusinessCode($code), $data);
         return $this->formatDataFields([
-            'status'  => $this->formatStatus($this->formatStatusCode($code, $data)),
-            'code'    => $code,
-            'message' => $this->formatMessage($code, $message),
+            'status'  => $this->formatStatus($this->statusCode),
+            'code'    => $this->formatBusinessCode($code),
+            'message' => $this->formatMessage($this->formatBusinessCode($code), $message),
             'data'    => $this->formatData($data),
             'error'   => $this->formatError($errors),
-        ], $this->config);
+        ]);
     }
 
     /**
@@ -160,37 +163,31 @@ class Format implements \yuanzhihai\response\think\contracts\Format
     /**
      * Format response data fields.
      *
-     * @param array $responseData
-     * @param array $dataFieldsConfig
+     * @param array $data
      * @return array
      */
-    protected function formatDataFields(array $responseData, array $dataFieldsConfig = []): array
+    protected function formatDataFields(array $data): array
     {
-        if (empty($dataFieldsConfig)) {
-            return $responseData;
-        }
+        return tap($data, function (&$item) use ($data) {
+            foreach ($this->config as $key => $config) {
+                if (!Arr::has($data, $key)) {
+                    continue;
+                }
 
-        foreach ($responseData as $field => $value) {
-            $fieldConfig = Arr::get($dataFieldsConfig, $field);
-            if (is_null($fieldConfig)) {
-                continue;
+                $show  = $config['show'] ?? true;
+                $alias = $config['alias'] ?? '';
+
+                if ($alias && $alias !== $key) {
+                    Arr::set($item, $alias, Arr::get($item, $key));
+                    $item = Arr::except($item, $key);
+                    $key  = $alias;
+                }
+
+                if (!$show) {
+                    $item = Arr::except($item, $key);
+                }
             }
-
-            if ($value && is_array($value) && in_array($field, ['data', 'meta', 'pagination'])) {
-                $value = $this->formatDataFields($value, Arr::get($dataFieldsConfig, "{$field}.fields", []));
-            }
-
-            $alias = $fieldConfig['alias'] ?? $field;
-            $show  = $fieldConfig['show'] ?? true;
-            $map   = $fieldConfig['map'] ?? null;
-            unset($responseData[$field]);
-
-            if ($show) {
-                $responseData[$alias] = $map[$value] ?? $value;
-            }
-        }
-
-        return $responseData;
+        });
     }
 
 }
