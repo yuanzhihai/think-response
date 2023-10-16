@@ -1,0 +1,37 @@
+{
+  "name": "yuanzhihai/think-response",
+  "description": "thinkphp api 项目提供一个规范统一的响应数据结构",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "yuanzhihai",
+      "email": "396751927@qq.com"
+    }
+  ],
+  "require": {
+    "php": "^7.2.5|^8.0",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "yuanzhihai/think-enum": "^1.0",
+    "topthink/framework": "^8.0.x-dev",
+    "topthink/think-orm": "^3.0.x-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "yuanzhihai\\response\\think\\": "src/"
+    }
+  },
+  "extra": {
+    "think": {
+      "config": {
+        "response": "config/response.php"
+      },
+      "services": [
+        "yuanzhihai\\response\\think\\ThinkServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
